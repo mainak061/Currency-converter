@@ -1,27 +1,29 @@
 document.addEventListener("DOMContentLoaded", () => {
-    const BASE_URL ="https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/latest/currencies";
+    const baseUrl = "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1";
 
     const dropdowns = document.querySelectorAll(".dropdown select");
-
     const btn = document.querySelector("form button");
-
     const fromCurr = document.querySelector(".from select");
-
     const toCurr = document.querySelector(".to select");
+    const msg = document.querySelector(".msg");
+
 
     for (let select of dropdowns) {
-        for (currCode in countryList) {
+        for (let currCode in countryList) {
             let newOption = document.createElement("option");
             newOption.innerText = currCode;
             newOption.value = currCode;
             select.append(newOption);
-            if (select.name === "from") select.value = "USD";
-            if (select.name === "to") select.value = "INR";
         }
+
+
+        if (select.name === "from") select.value = "USD";
+        if (select.name === "to") select.value = "INR";
         select.addEventListener("change", (evt) => {
             updateFlag(evt.target);
         });
     }
+
 
     const updateFlag = (element) => {
         let currCode = element.value;
@@ -31,18 +33,32 @@ document.addEventListener("DOMContentLoaded", () => {
         img.src = newSrc;
     };
 
-    btn.addEventListener("click", async(evt) => {
+
+    btn.addEventListener("click", async (evt) => {
         evt.preventDefault();
-        let amount = document.querySelector(".amount input");
-        let amountVal = amount.value;
-        if (amountVal === "" || amountVal < 1) {
+
+        let amountInput = document.querySelector(".amount input");
+        let amountVal = parseFloat(amountInput.value);
+
+        if (isNaN(amountVal) || amountVal < 1) {
             amountVal = 1;
-            amount.value = "1";
+            amountInput.value = "1";
         }
-        console.log(fromCurr.value, toCurr.value);
-        const URL=`${BASE_URL}/${fromCurr.value.toLowerCase()}/${toCurr.value.toLowerCase()}.json`;
-        // console.log(URL);
-        let response= await fetch(URL);
-        console.log(response);
+
+        const fromCode = fromCurr.value.toLowerCase();
+        const toCode = toCurr.value.toLowerCase();
+        const URL = `${baseUrl}/currencies/${fromCode}.json`;
+
+        try {
+            const response = await fetch(URL);
+            const data = await response.json();
+            const rate = data[fromCode][toCode];
+
+            const total = (amountVal * rate).toFixed(2);
+            msg.innerText = `${amountVal} ${fromCurr.value} = ${total} ${toCurr.value}`;
+        } catch (error) {
+            console.error("Error fetching exchange rate:", error);
+            msg.innerText = "Failed to fetch exchange rate. Try again.";
+        }
     });
 });
