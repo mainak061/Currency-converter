@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
-    const baseURL ="https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies.json";
+    const BASE_URL ="https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/latest/currencies";
 
     const dropdowns = document.querySelectorAll(".dropdown select");
 
@@ -32,6 +32,7 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     btn.addEventListener("click", async(evt) => {
+        evt.preventDefault();
         let amount = document.querySelector(".amount input");
         let amountVal = amount.value;
         if (amountVal === "" || amountVal < 1) {
@@ -39,9 +40,9 @@ document.addEventListener("DOMContentLoaded", () => {
             amount.value = "1";
         }
         console.log(fromCurr.value, toCurr.value);
-        const URL=`${baseURL}/${fromCurr.value.toLowerCase()}/${toCurr.value.toLowerCase()}.json`;
-        console.log(URL);
-    //     let response= await fetch(URL);
-    //     console.log(response);
+        const URL=`${BASE_URL}/${fromCurr.value.toLowerCase()}/${toCurr.value.toLowerCase()}.json`;
+        // console.log(URL);
+        let response= await fetch(URL);
+        console.log(response);
     });
 });
